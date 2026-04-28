@@ -1,0 +1,34 @@
+# Python derleme dosyaları
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+.env/
+.env.local
+.env.*
+.env.*
+.env.*
+.venv/
+env/
+ENV/
+
+# IDE & Editor dosyaları
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Log ve temp dosyalar
+logs/
+*.log
+*.pot
+*.thmx
+*.accdb
+*.crdownload
+
+# Diğer
+.DS_Store
+Thumbs.db

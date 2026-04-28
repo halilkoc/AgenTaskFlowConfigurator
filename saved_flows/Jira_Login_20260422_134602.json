@@ -1,0 +1,198 @@
+{
+    "flow_config": [
+        {
+            "flow_name": "Jira_Login",
+            "categories": {
+                "Login_Form": {
+                    "id": "01",
+                    "name": "Giriş Formu Doldurma",
+                    "description": "Kullanıcı adı ve şifre alanlarını doldurup giriş butonuna tıklar.",
+                    "browser_options": {
+                        "attach_to_existing": false,
+                        "browser_type": "firefox",
+                        "headless": false
+                    },
+                    "actions": [
+                        {
+                            "type": "navigate",
+                            "selector": "",
+                            "value": null,
+                            "text": null,
+                            "url": "https://jira.isbank",
+                            "description": "Jira giriş sayfasına git",
+                            "prompt": "Jira giriş sayfasına git",
+                            "timeout": 10000,
+                            "status": "executed",
+                            "validation_selector": "",
+                            "execution_error": null,
+                            "context_name": "main",
+                            "navigation_happened": null,
+                            "navigated_url": null
+                        },
+                        {
+                            "type": "fill",
+                            "selector": "//*[@id=\"login-form-username\"]",
+                            "value": "200605",
+                            "text": "200605",
+                            "url": null,
+                            "description": "Kullanıcı adı alanına 200605 yaz",
+                            "prompt": "Kullanıcı adı alanına 200605 yaz",
+                            "timeout": 10000,
+                            "status": "failed",
+                            "validation_selector": "//*[@id=\"login-form-username\"]",
+                            "execution_error": "Locator.wait_for: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator(\"//*[@id=\\\"login-form-username\\\"]\").first to be visible\n",
+                            "context_name": "main",
+                            "navigation_happened": null,
+                            "navigated_url": null
+                        },
+                        {
+                            "type": "focus_and_fill",
+                            "selector": "//*[@id=\"login-form-password\"]",
+                            "value": "2040.Focus",
+                            "text": "2040.Focus",
+                            "url": null,
+                            "description": "Şifre alanına 2040.Focus yaz",
+                            "prompt": "Şifre alanına 2040.Focus yaz",
+                            "timeout": 10000,
+                            "status": "failed",
+                            "validation_selector": "//*[@id=\"login-form-password\"]",
+                            "execution_error": "Locator.wait_for: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator(\"//*[@id=\\\"login-form-password\\\"]\").first to be visible\n",
+                            "context_name": "main",
+                            "navigation_happened": null,
+                            "navigated_url": null
+                        },
+                        {
+                            "type": "click",
+                            "selector": "//*[@id=\"login\"]",
+                            "value": null,
+                            "text": null,
+                            "url": null,
+                            "description": "Login butonuna tıkla",
+                            "prompt": "Login butonuna tıkla",
+                            "timeout": 10000,
+                            "status": "failed",
+                            "validation_selector": "//*[@id=\"login\"]",
+                            "execution_error": "Locator.wait_for: Timeout 10000ms exceeded.\nCall log:\n  - waiting for locator(\"//*[@id=\\\"login\\\"]\").first to be visible\n",
+                            "context_name": "main",
+                            "navigation_happened": true,
+                            "navigated_url": "https://jira.isbank/jira/secure/RapidBoard.jspa"
+                        }
+                    ]
+                },
+                "Search_Jira_Issue": {
+                    "id": "01",
+                    "name": "Jira'da Arama Yap",
+                    "description": "Jira arama alanına COR-10573 yaz ve sonuçları bekle.",
+                    "browser_options": {
+                        "attach_to_existing": false,
+                        "browser_type": "firefox",
+                        "headless": false
+                    },
+                    "actions": [
+                        {
+                            "type": "navigate",
+                            "selector": "",
+                            "value": null,
+                            "text": null,
+                            "url": "https://jira.isbank",
+                            "description": "Jira ana sayfasına git",
+                            "prompt": "Jira ana sayfasına git",
+                            "timeout": 10000,
+                            "status": "executed",
+                            "validation_selector": "",
+                            "execution_error": null,
+                            "context_name": "main",
+                            "navigation_happened": null,
+                            "navigated_url": null
+                        },
+                        {
+                            "type": "fill",
+                            "selector": "//*[@id=\"quickSearchInput\"]",
+                            "value": "COR-10573",
+                            "text": "COR-10573",
+                            "url": null,
+                            "description": "Arama alanına COR-10573 yaz",
+                            "prompt": "Arama alanına COR-10573 yaz",
+                            "timeout": 10000,
+                            "status": "executed",
+                            "validation_selector": "//*[@id=\"quickSearchInput\"]",
+                            "execution_error": null,
+                            "context_name": "main",
+                            "navigation_happened": null,
+                            "navigated_url": null
+                        },
+                        {
+                            "type": "wait",
+                            "selector": "",
+                            "value": null,
+                            "text": null,
+                            "url": null,
+                            "description": "Arama sonuçlarının yüklenmesini bekle",
+                            "prompt": "Arama sonuçlarının yüklenmesini bekle",
+                            "timeout": 10000,
+                            "status": "failed",
+                            "validation_selector": "",
+                            "execution_error": "Uygun selector bulunamadı.",
+                            "context_name": "main",
+                            "navigation_happened": null,
+                            "navigated_url": null
+                        },
+                        {
+                            "type": "click",
+                            "selector": "/html[1]/body[1]/div[1]/header[1]/nav[1]/div[1]/div[3]/ul[1]/li[1]/form[1]/div[1]/div[1]/ul[1]/li[1]/a[1]",
+                            "value": null,
+                            "text": null,
+                            "url": null,
+                            "description": "Arama sonucu olarak çıkan ilk öğeye tıkla",
+                            "prompt": "Arama sonucu olarak çıkan ilk öğeye tıkla",
+                            "timeout": 10000,
+                            "status": "selector_updated",
+                            "validation_selector": "//a[normalize-space()=\"Linked Applications\"]",
+                            "execution_error": null,
+                            "context_name": "main",
+                            "navigation_happened": false,
+                            "navigated_url": null
+                        }
+                    ]
+                }
+            },
+            "execution_order": [
+                "Login_Form",
+                "Search_Jira_Issue"
+            ],
+            "global_settings": {
+                "browser_type": "chromium",
+                "timeout": 30000,
+                "screenshot_on_failure": true,
+                "video_recording": false,
+                "attach_timeout": 10000,
+                "screenshot_path": "REFramework/screenshots",
+                "last_known_url": "https://jira.isbank/jira/secure/RapidBoard.jspa?rapidView=12253",
+                "initial_url": "https://jira.isbank/jira/secure/RapidBoard.jspa?rapidView=12253",
+                "browser_executable_paths": {
+                    "chromium": "",
+                    "firefox": "",
+                    "webkit": null
+                }
+            }
+        }
+    ],
+    "parameters": {
+        "cyberark_domain": "",
+        "queue_db_query": "",
+        "har_recording": true,
+        "queue_name": "",
+        "dlq_queue_name": "",
+        "mongo_collection_name": "",
+        "s3_bucket_name": "",
+        "could_dchost_run": false,
+        "image_name": "",
+        "use_frontend": true,
+        "parellel_count": 1,
+        "user_username": "",
+        "user_password": "",
+        "Nar_Users": [],
+        "MaxRetryNumber": 3,
+        "service_parameters": {}
+    }
+}

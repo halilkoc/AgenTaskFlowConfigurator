@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AgenTask Designer</title>
+    <link rel="stylesheet" href="/static/css/styles.css" />
+</head>
+
+<body>
+    <div class="page">
+        <div class="header">
+            <h1>AgenTask Designer</h1>
+            <p>Browser / Desktop tabanlı otomasyon akışı oluşturma ekranı</p>
+        </div>
+        <div class="layout">
+            <div class="panel left-panel">
+                <h2>Kontroller</h2>
+                <div class="form-group">
+                    <label for="selected_mode">Çalışma Tipi</label>
+                    <select id="selected_mode" name="selected_mode" onchange="toggleBrowserFields()">
+                        <option value="browser" {% if ui_state.selected_mode=='browser' %}selected{% endif %}>Browser
+                        </option>
+                        <option value="desktop" {% if ui_state.selected_mode=='desktop' %}selected{% endif %}>Desktop
+                        </option>
+                    </select>
+                </div>
+                <div id="browser-fields" {% if ui_state.selected_mode !="browser" %}style="display:none;" {% endif %}>
+                    <div class="form-group">
+                        <label for="target_url">Link</label>
+                        <input id="target_url" type="text" name="target_url" placeholder="https://ornek-site.com"
+                            value="{{ ui_state.target_url }}" />
+                    </div>
+                    <div class="form-group">
+                        <label for="browser_type">Browser Tipi</label>
+                        <select id="browser_type" name="browser_type">
+                            <option value="chromium" {% if ui_state.browser_type=='chromium' %}selected{% endif %}>
+                                Chromium</option>
+                            <option value="firefox" {% if ui_state.browser_type=='firefox' %}selected{% endif %}>Firefox
+                            </option>
+                            <option value="webkit" {% if ui_state.browser_type=='webkit' %}selected{% endif %}>WebKit
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <label for="headless">
+                            <input id="headless" type="checkbox" name="headless" value="true" {% if ui_state.headless
+                                %}checked{% endif %} />
+                            Headless çalıştır
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="flow_build_mode">Akış Oluşturma Modu</label>
+                    <select id="flow_build_mode" name="flow_build_mode">
+                        <option value="replace" {% if ui_state.flow_build_mode=='replace' %}selected{% endif %}>
+                            Sıfırdan oluştur
+                        </option>
+                        <option value="append" {% if ui_state.flow_build_mode=='append' %}selected{% endif %}>
+                            Mevcut flow config üzerine ekle
+                        </option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="prompt_text">Prompt</label>
+                    <textarea id="prompt_text" name="prompt_text" rows="8"
+                        placeholder="Yapılacak işlemi yaz...">{{ ui_state.prompt_text }}</textarea>
+                </div>
+                <form method="post" action="/ui/start-session">
+                    <input type="hidden" id="start_selected_mode" name="selected_mode" />
+                    <input type="hidden" id="start_target_url" name="target_url" />
+                    <input type="hidden" id="start_prompt_text" name="prompt_text" />
+                    <input type="hidden" id="start_browser_type" name="browser_type" />
+                    <input type="hidden" id="start_headless" name="headless" />
+                    <input type="hidden" id="start_flow_build_mode" name="flow_build_mode" />
+                    <div class="button-row">
+                        <button type="submit" onclick="copyValuesToForm('start')">Oturumu Başlat</button>
+                    </div>
+                </form>
+                <form method="post" action="/ui/stop-session">
+                    <input type="hidden" id="stop_selected_mode" name="selected_mode" />
+                    <input type="hidden" id="stop_target_url" name="target_url" />
+                    <input type="hidden" id="stop_prompt_text" name="prompt_text" />
+                    <input type="hidden" id="stop_browser_type" name="browser_type" />
+                    <input type="hidden" id="stop_headless" name="headless" />
+                    <input type="hidden" id="stop_flow_build_mode" name="flow_build_mode" />
+                    <div class="button-row">
+                        <button type="submit" class="secondary" onclick="copyValuesToForm('stop')">Oturumu
+                            Sonlandır</button>
+                    </div>
+                </form>
+                <form method="post" action="/ui/run-prompt">
+                    <input type="hidden" id="run_selected_mode" name="selected_mode" />
+                    <input type="hidden" id="run_target_url" name="target_url" />
+                    <input type="hidden" id="run_prompt_text" name="prompt_text" />
+                    <input type="hidden" id="run_browser_type" name="browser_type" />
+                    <input type="hidden" id="run_headless" name="headless" />
+                    <input type="hidden" id="run_flow_build_mode" name="flow_build_mode" />
+                    <div class="button-row">
+                        <button type="submit" class="success" onclick="copyValuesToForm('run')">Prompt'u
+                            Çalıştır</button>
+                    </div>
+                </form>
+                <div class="status-box">
+                    <strong>Durum:</strong>
+                    <p>{{ ui_state.session_status_message }}</p>
+                    {% if ui_state.current_url %}
+                    <p><strong>Aktif URL:</strong> {{ ui_state.current_url }}</p>
+                    {% endif %}
+                    {% if ui_state.last_error %}
+                    <p class="error-text"><strong>Hata:</strong> {{ ui_state.last_error }}</p>
+                    {% endif %}
+                    {% if ui_state.picker_enabled %}
+                    <p><strong>Picker Durumu:</strong> Aktif</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="panel right-panel">
+                <h2>Flow Config Düzenleme Alanı</h2>
+                <form method="post" action="/ui/reset-flow-config">
+                    <input type="hidden" id="reset_selected_mode" name="selected_mode" />
+                    <input type="hidden" id="reset_target_url" name="target_url" />
+                    <input type="hidden" id="reset_prompt_text" name="prompt_text" />
+                    <input type="hidden" id="reset_browser_type" name="browser_type" />
+                    <input type="hidden" id="reset_headless" name="headless" />
+                    <input type="hidden" id="reset_flow_build_mode" name="flow_build_mode" />
+                    <div class="button-row">
+                        <button type="submit" class="secondary" onclick="copyValuesToResetForm()">
+                            Yeni Akış Başlat
+                        </button>
+                    </div>
+                </form>
+                <form method="post" action="/ui/save-flow-config">
+                    <input type="hidden" id="save_selected_mode" name="selected_mode" />
+                    <input type="hidden" id="save_target_url" name="target_url" />
+                    <input type="hidden" id="save_prompt_text" name="prompt_text" />
+                    <input type="hidden" id="save_browser_type" name="browser_type" />
+                    <input type="hidden" id="save_headless" name="headless" />
+                    <input type="hidden" id="save_flow_build_mode" name="flow_build_mode" />
+                    <div class="form-group">
+                        <label for="save_file_name">Kaydetme Dosya Adı</label>
+                        <input id="save_file_name" type="text" name="save_file_name"
+                            placeholder="Örn: jira_login_akis.json" />
+                    </div>
+                    <textarea id="flow_config_json_save" class="json-viewer hidden-json"
+                        name="flow_config_json">{{ ui_state.flow_config_json }}</textarea>
+                    <div class="button-row">
+                        <button type="submit" onclick="copyValuesToSaveForm()">
+                            Flow Config'i Kaydet
+                        </button>
+                    </div>
+                </form>
+                <form method="post" action="/ui/load-flow-config">
+                    <input type="hidden" id="load_selected_mode" name="selected_mode" />
+                    <input type="hidden" id="load_target_url" name="target_url" />
+                    <input type="hidden" id="load_prompt_text" name="prompt_text" />
+                    <input type="hidden" id="load_browser_type" name="browser_type" />
+                    <input type="hidden" id="load_headless" name="headless" />
+                    <input type="hidden" id="load_flow_build_mode" name="flow_build_mode" />
+                    <div class="form-group">
+                        <label for="selected_saved_flow_file">Kayıtlı Akışlar</label>
+                        <select id="selected_saved_flow_file" name="selected_saved_flow_file">
+                            <option value="">Dosya seç</option>
+                            {% for item in ui_state.saved_flow_files %}
+                            <option value="{{ item.file_name }}">{{ item.file_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="button-row">
+                        <button type="submit" onclick="copyValuesToLoadForm()">
+                            Flow Config Yükle
+                        </button>
+                    </div>
+                </form>
+                <form method="post" action="/ui/clear-selector-corrections">
+                    <input type="hidden" id="clear_selected_mode" name="selected_mode" />
+                    <input type="hidden" id="clear_target_url" name="target_url" />
+                    <input type="hidden" id="clear_prompt_text" name="prompt_text" />
+                    <input type="hidden" id="clear_browser_type" name="browser_type" />
+                    <input type="hidden" id="clear_headless" name="headless" />
+                    <input type="hidden" id="clear_flow_config_json" name="flow_config_json" />
+                    <input type="hidden" id="clear_flow_build_mode" name="flow_build_mode" />
+                    <div class="button-row">
+                        <button type="submit" class="secondary" onclick="copyValuesToClearCorrectionsForm()">
+                            Kaydedilmiş Selector Düzeltmelerini Temizle
+                        </button>
+                    </div>
+                </form>
+                <div class="form-group">
+                    <label>Kaydedilmiş Selector Düzeltmeleri</label>
+                    <textarea class="json-viewer small-json" readonly>{% for key, value in ui_state.saved_corrections.items() %}{{ key }} => {{ value }}
+{% endfor %}</textarea>
+                </div>
+                <form method="post" action="/ui/enable-picker">
+                    <input type="hidden" id="picker_selected_mode" name="selected_mode" />
+                    <input type="hidden" id="picker_target_url" name="target_url" />
+                    <input type="hidden" id="picker_prompt_text" name="prompt_text" />
+                    <input type="hidden" id="picker_browser_type" name="browser_type" />
+                    <input type="hidden" id="picker_headless" name="headless" />
+                    <input type="hidden" id="picker_flow_config_json" name="flow_config_json" />
+                    <input type="hidden" id="picker_flow_build_mode" name="flow_build_mode" />
+                    <div class="button-row">
+                        <button type="submit" onclick="copyValuesToPickerForm()">
+                            Selector Picker Başlat
+                        </button>
+                    </div>
+                </form>
+                <form method="post" action="/ui/enable-delayed-picker">
+                    <input type="hidden" id="delayed_picker_selected_mode" name="selected_mode" />
+                    <input type="hidden" id="delayed_picker_target_url" name="target_url" />
+                    <input type="hidden" id="delayed_picker_prompt_text" name="prompt_text" />
+                    <input type="hidden" id="delayed_picker_browser_type" name="browser_type" />
+                    <input type="hidden" id="delayed_picker_headless" name="headless" />
+                    <input type="hidden" id="delayed_picker_flow_config_json" name="flow_config_json" />
+                    <input type="hidden" id="delayed_picker_flow_build_mode" name="flow_build_mode" />
+                    <div class="form-group">
+                        <label for="picker_delay_seconds">Gecikmeli Picker Süresi (sn)</label>
+                        <input id="picker_delay_seconds" type="number" name="picker_delay_seconds" min="1" value="3" />
+                    </div>
+                    <div class="button-row">
+                        <button type="submit" onclick="copyValuesToDelayedPickerForm()">
+                            Gecikmeli Picker Başlat
+                        </button>
+                    </div>
+                </form>
+                <form method="post" action="/ui/read-picked-selector">
+                    <input type="hidden" id="read_selected_mode" name="selected_mode" />
+                    <input type="hidden" id="read_target_url" name="target_url" />
+                    <input type="hidden" id="read_prompt_text" name="prompt_text" />
+                    <input type="hidden" id="read_browser_type" name="browser_type" />
+                    <input type="hidden" id="read_headless" name="headless" />
+                    <input type="hidden" id="read_flow_config_json" name="flow_config_json" />
+                    <input type="hidden" id="read_flow_build_mode" name="flow_build_mode" />
+                    <div class="button-row">
+                        <button type="submit" onclick="copyValuesToReadForm()">
+                            Seçilen Selector'ü Oku
+                        </button>
+                    </div>
+                </form>
+                <div class="form-group">
+                    <label for="picked_selector">Seçilen Selector</label>
+                    <input id="picked_selector" type="text" value="{{ ui_state.picked_selector }}" readonly />
+                </div>
+                <form method="post" action="/ui/apply-picked-selector-by-choice">
+                    <input type="hidden" id="apply_selected_mode" name="selected_mode" />
+                    <input type="hidden" id="apply_target_url" name="target_url" />
+                    <input type="hidden" id="apply_prompt_text" name="prompt_text" />
+                    <input type="hidden" id="apply_browser_type" name="browser_type" />
+                    <input type="hidden" id="apply_headless" name="headless" />
+                    <input type="hidden" id="apply_flow_build_mode" name="flow_build_mode" />
+                    <div class="form-group">
+                        <label for="selected_action_ref">Selector'ün Uygulanacağı Action</label>
+                        <select id="selected_action_ref" name="selected_action_ref">
+                            <option value="">Action seç</option>
+                            {% for action in ui_state.available_actions %}
+                            <option value="{{ action.category_key }}::{{ action.action_index }}">
+                                {{ action.label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <textarea id="flow_config_json" class="json-viewer"
+                        name="flow_config_json">{{ ui_state.flow_config_json }}</textarea>
+                    <input type="hidden" name="picked_selector" id="apply_picked_selector_value" />
+                    <div class="button-row">
+                        <button type="submit" onclick="copyValuesToApplyPickedSelectorForm()">
+                            Seçilen Selector'ü Action'a Uygula
+                        </button>
+                    </div>
+                </form>
+                <form method="post" action="/ui/validate-flow-config">
+                    <input type="hidden" id="validate_selected_mode" name="selected_mode" />
+                    <input type="hidden" id="validate_target_url" name="target_url" />
+                    <input type="hidden" id="validate_prompt_text" name="prompt_text" />
+                    <input type="hidden" id="validate_browser_type" name="browser_type" />
+                    <input type="hidden" id="validate_headless" name="headless" />
+                    <input type="hidden" id="validate_flow_build_mode" name="flow_build_mode" />
+                    <textarea id="flow_config_json_validate" class="json-viewer hidden-json"
+                        name="flow_config_json">{{ ui_state.flow_config_json }}</textarea>
+                    <div class="button-row">
+                        <button type="submit" onclick="copyValuesToValidateForm()">
+                            Config'i Doğrula
+                        </button>
+                    </div>
+                </form>
+                <div class="form-group">
+                    <label for="validation_results_json">Validation Sonuçları</label>
+                    <textarea id="validation_results_json" class="json-viewer small-json"
+                        readonly>{{ ui_state.validation_results_json }}</textarea>
+                </div>
+                <form method="post" action="/ui/run-single-action">
+                    <input type="hidden" id="single_selected_mode" name="selected_mode" />
+                    <input type="hidden" id="single_target_url" name="target_url" />
+                    <input type="hidden" id="single_prompt_text" name="prompt_text" />
+                    <input type="hidden" id="single_browser_type" name="browser_type" />
+                    <input type="hidden" id="single_headless" name="headless" />
+                    <input type="hidden" id="single_flow_build_mode" name="flow_build_mode" />
+                    <div class="form-group">
+                        <label>Action Çalıştırma Geçmişi</label>
+                        <textarea class="json-viewer small-json" readonly>{% for item in ui_state.action_history %}{{ item.category_key }} / #{{ item.action_index }} / {{ item.action_type }} / {{ item.status }} / run_count={{ item.run_count }} / last_run_at={{ item.last_run_at }}{% if item.execution_error %} / error={{ item.execution_error }}{% endif %}{% if item.screenshot_path %} / screenshot={{ item.screenshot_path }}{% endif %}
+{% endfor %}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="selected_debug_action_ref">Tekrar Çalıştırılacak Action</label>
+                        <select id="selected_debug_action_ref" name="selected_debug_action_ref">
+                            <option value="">Action seç</option>
+                            {% for action in ui_state.available_actions %}
+                            <option value="{{ action.category_key }}::{{ action.action_index }}" {% if
+                                ui_state.selected_debug_action_ref==action.category_key ~ '::' ~ action.action_index
+                                %}selected{% endif %}>
+                                {{ action.label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <textarea id="flow_config_json_single" class="json-viewer hidden-json"
+                        name="flow_config_json">{{ ui_state.flow_config_json }}</textarea>
+                    <div class="button-row">
+                        <button type="submit" onclick="copyValuesToSingleActionForm()">
+                            Seçilen Action'ı Tekrar Çalıştır
+                        </button>
+                    </div>
+                </form>
+                <form method="post" action="/ui/replay-flow-config">
+                    <input type="hidden" id="replay_selected_mode" name="selected_mode" />
+                    <input type="hidden" id="replay_target_url" name="target_url" />
+                    <input type="hidden" id="replay_prompt_text" name="prompt_text" />
+                    <input type="hidden" id="replay_browser_type" name="browser_type" />
+                    <input type="hidden" id="replay_headless" name="headless" />
+                    <input type="hidden" id="replay_flow_build_mode" name="flow_build_mode" />
+                    <textarea id="flow_config_json_replay" class="json-viewer hidden-json"
+                        name="flow_config_json">{{ ui_state.flow_config_json }}</textarea>
+                    <div class="button-row">
+                        <button type="submit" class="success" onclick="copyValuesToReplayForm()">
+                            Düzeltilmiş Config'i Çalıştır
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        function toggleBrowserFields() {
+            const selectedMode = document.getElementById("selected_mode");
+            const browserFields = document.getElementById("browser-fields");
+            if (!selectedMode || !browserFields) return;
+            browserFields.style.display = selectedMode.value === "browser" ? "block" : "none";
+        }
+        function getTargetUrlValue() {
+            const targetUrl = document.getElementById("target_url");
+            return targetUrl ? targetUrl.value : "";
+        }
+        function getBrowserTypeValue() {
+            const browserType = document.getElementById("browser_type");
+            return browserType ? browserType.value : "chromium";
+        }
+        function getHeadlessValue() {
+            const headless = document.getElementById("headless");
+            return headless && headless.checked ? "true" : "false";
+        }
+        function getFlowConfigValue() {
+            const flowConfig = document.getElementById("flow_config_json");
+            return flowConfig ? flowConfig.value : "";
+        }
+        function getFlowBuildModeValue() {
+            const flowBuildMode = document.getElementById("flow_build_mode");
+            return flowBuildMode ? flowBuildMode.value : "replace";
+        }
+        function copyValuesToForm(prefix) {
+            document.getElementById(prefix + "_selected_mode").value =
+                document.getElementById("selected_mode").value;
+            document.getElementById(prefix + "_target_url").value = getTargetUrlValue();
+            document.getElementById(prefix + "_prompt_text").value =
+                document.getElementById("prompt_text").value;
+            document.getElementById(prefix + "_browser_type").value = getBrowserTypeValue();
+            document.getElementById(prefix + "_headless").value = getHeadlessValue();
+            const flowBuildModeField = document.getElementById(prefix + "_flow_build_mode");
+            if (flowBuildModeField) {
+                flowBuildModeField.value = getFlowBuildModeValue();
+            }
+        }
+        function copyValuesToReplayForm() {
+            document.getElementById("replay_selected_mode").value =
+                document.getElementById("selected_mode").value;
+            document.getElementById("replay_target_url").value = getTargetUrlValue();
+            document.getElementById("replay_prompt_text").value =
+                document.getElementById("prompt_text").value;
+            document.getElementById("replay_browser_type").value = getBrowserTypeValue();
+            document.getElementById("replay_headless").value = getHeadlessValue();
+            document.getElementById("flow_config_json_replay").value = getFlowConfigValue();
+            const replayFlowBuildMode = document.getElementById("replay_flow_build_mode");
+            if (replayFlowBuildMode) {
+                replayFlowBuildMode.value = getFlowBuildModeValue();
+            }
+        }
+        function copyValuesToPickerForm() {
+            document.getElementById("picker_selected_mode").value =
+                document.getElementById("selected_mode").value;
+            document.getElementById("picker_target_url").value = getTargetUrlValue();
+            document.getElementById("picker_prompt_text").value =
+                document.getElementById("prompt_text").value;
+            document.getElementById("picker_browser_type").value = getBrowserTypeValue();
+            document.getElementById("picker_headless").value = getHeadlessValue();
+            document.getElementById("picker_flow_config_json").value = getFlowConfigValue();
+            const pickerFlowBuildMode = document.getElementById("picker_flow_build_mode");
+            if (pickerFlowBuildMode) {
+                pickerFlowBuildMode.value = getFlowBuildModeValue();
+            }
+        }
+        function copyValuesToReadForm() {
+            document.getElementById("read_selected_mode").value =
+                document.getElementById("selected_mode").value;
+            document.getElementById("read_target_url").value = getTargetUrlValue();
+            document.getElementById("read_prompt_text").value =
+                document.getElementById("prompt_text").value;
+            document.getElementById("read_browser_type").value = getBrowserTypeValue();
+            document.getElementById("read_headless").value = getHeadlessValue();
+            document.getElementById("read_flow_config_json").value = getFlowConfigValue();
+            const readFlowBuildMode = document.getElementById("read_flow_build_mode");
+            if (readFlowBuildMode) {
+                readFlowBuildMode.value = getFlowBuildModeValue();
+            }
+        }
+        function copyValuesToApplyPickedSelectorForm() {
+            document.getElementById("apply_selected_mode").value =
+                document.getElementById("selected_mode").value;
+            document.getElementById("apply_target_url").value = getTargetUrlValue();
+            document.getElementById("apply_prompt_text").value =
+                document.getElementById("prompt_text").value;
+            document.getElementById("apply_browser_type").value = getBrowserTypeValue();
+            document.getElementById("apply_headless").value = getHeadlessValue();
+            document.getElementById("apply_picked_selector_value").value =
+                document.getElementById("picked_selector").value;
+            const applyFlowBuildMode = document.getElementById("apply_flow_build_mode");
+            if (applyFlowBuildMode) {
+                applyFlowBuildMode.value = getFlowBuildModeValue();
+            }
+        }
+        function copyValuesToValidateForm() {
+            document.getElementById("validate_selected_mode").value =
+                document.getElementById("selected_mode").value;
+            document.getElementById("validate_target_url").value = getTargetUrlValue();
+            document.getElementById("validate_prompt_text").value =
+                document.getElementById("prompt_text").value;
+            document.getElementById("validate_browser_type").value = getBrowserTypeValue();
+            document.getElementById("validate_headless").value = getHeadlessValue();
+            document.getElementById("flow_config_json_validate").value = getFlowConfigValue();
+            const validateFlowBuildMode = document.getElementById("validate_flow_build_mode");
+            if (validateFlowBuildMode) {
+                validateFlowBuildMode.value = getFlowBuildModeValue();
+            }
+        }
+        function copyValuesToClearCorrectionsForm() {
+            document.getElementById("clear_selected_mode").value =
+                document.getElementById("selected_mode").value;
+            document.getElementById("clear_target_url").value = getTargetUrlValue();
+            document.getElementById("clear_prompt_text").value =
+                document.getElementById("prompt_text").value;
+            document.getElementById("clear_browser_type").value = getBrowserTypeValue();
+            document.getElementById("clear_headless").value = getHeadlessValue();
+            document.getElementById("clear_flow_config_json").value = getFlowConfigValue();
+            const clearFlowBuildMode = document.getElementById("clear_flow_build_mode");
+            if (clearFlowBuildMode) {
+                clearFlowBuildMode.value = getFlowBuildModeValue();
+            }
+        }
+        document.addEventListener("DOMContentLoaded", function () {
+            toggleBrowserFields();
+        });
+        function copyValuesToResetForm() {
+            document.getElementById("reset_selected_mode").value =
+                document.getElementById("selected_mode").value;
+            document.getElementById("reset_target_url").value = getTargetUrlValue();
+            document.getElementById("reset_prompt_text").value =
+                document.getElementById("prompt_text").value;
+            document.getElementById("reset_browser_type").value = getBrowserTypeValue();
+            document.getElementById("reset_headless").value = getHeadlessValue();
+            const resetFlowBuildMode = document.getElementById("reset_flow_build_mode");
+            if (resetFlowBuildMode) {
+                resetFlowBuildMode.value = getFlowBuildModeValue();
+            }
+        }
+        function copyValuesToSaveForm() {
+            document.getElementById("save_selected_mode").value =
+                document.getElementById("selected_mode").value;
+            document.getElementById("save_target_url").value = getTargetUrlValue();
+            document.getElementById("save_prompt_text").value =
+                document.getElementById("prompt_text").value;
+            document.getElementById("save_browser_type").value = getBrowserTypeValue();
+            document.getElementById("save_headless").value = getHeadlessValue();
+            document.getElementById("flow_config_json_save").value = getFlowConfigValue();
+            const saveFlowBuildMode = document.getElementById("save_flow_build_mode");
+            if (saveFlowBuildMode) {
+                saveFlowBuildMode.value = getFlowBuildModeValue();
+            }
+        }
+        function copyValuesToLoadForm() {
+            document.getElementById("load_selected_mode").value =
+                document.getElementById("selected_mode").value;
+            document.getElementById("load_target_url").value = getTargetUrlValue();
+            document.getElementById("load_prompt_text").value =
+                document.getElementById("prompt_text").value;
+            document.getElementById("load_browser_type").value = getBrowserTypeValue();
+            document.getElementById("load_headless").value = getHeadlessValue();
+            const loadFlowBuildMode = document.getElementById("load_flow_build_mode");
+            if (loadFlowBuildMode) {
+                loadFlowBuildMode.value = getFlowBuildModeValue();
+            }
+        }
+        function copyValuesToSingleActionForm() {
+            document.getElementById("single_selected_mode").value =
+                document.getElementById("selected_mode").value;
+            document.getElementById("single_target_url").value = getTargetUrlValue();
+            document.getElementById("single_prompt_text").value =
+                document.getElementById("prompt_text").value;
+            document.getElementById("single_browser_type").value = getBrowserTypeValue();
+            document.getElementById("single_headless").value = getHeadlessValue();
+            document.getElementById("flow_config_json_single").value = getFlowConfigValue();
+            const singleFlowBuildMode = document.getElementById("single_flow_build_mode");
+            if (singleFlowBuildMode) {
+                singleFlowBuildMode.value = getFlowBuildModeValue();
+            }
+        }
+        function copyValuesToDelayedPickerForm() {
+            document.getElementById("delayed_picker_selected_mode").value =
+                document.getElementById("selected_mode").value;
+            document.getElementById("delayed_picker_target_url").value = getTargetUrlValue();
+            document.getElementById("delayed_picker_prompt_text").value =
+                document.getElementById("prompt_text").value;
+            document.getElementById("delayed_picker_browser_type").value = getBrowserTypeValue();
+            document.getElementById("delayed_picker_headless").value = getHeadlessValue();
+            document.getElementById("delayed_picker_flow_config_json").value = getFlowConfigValue();
+            const delayedPickerFlowBuildMode = document.getElementById("delayed_picker_flow_build_mode");
+            if (delayedPickerFlowBuildMode) {
+                delayedPickerFlowBuildMode.value = getFlowBuildModeValue();
+            }
+        }
+    </script>
+</body>
+
+</html>

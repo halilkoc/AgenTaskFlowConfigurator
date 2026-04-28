@@ -1,0 +1,10 @@
+{
+    "fill::kullanıcı adı alanına 200605 yaz": {
+        "selector": "//*[@id=\"login-form-username\"]",
+        "context_name": "main"
+    },
+    "click::login butonuna tıkla": {
+        "selector": "//*[@id=\"login\"]",
+        "context_name": "main"
+    }
+}

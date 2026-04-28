@@ -1,0 +1,121 @@
+{
+    "flow_config": [
+        {
+            "flow_name": "Jira_Login",
+            "categories": {
+                "Login_Form": {
+                    "id": "01",
+                    "name": "Giriş Formu Doldurma",
+                    "description": "Kullanıcı adı ve şifre alanlarını doldurup giriş butonuna tıklar.",
+                    "browser_options": {
+                        "attach_to_existing": false,
+                        "browser_type": "firefox",
+                        "headless": false
+                    },
+                    "actions": [
+                        {
+                            "type": "navigate",
+                            "selector": "",
+                            "value": null,
+                            "text": null,
+                            "url": "https://jira.isbank",
+                            "description": "Jira giriş sayfasına git",
+                            "prompt": "Jira giriş sayfasına git",
+                            "timeout": 10000,
+                            "status": "executed",
+                            "validation_selector": "",
+                            "execution_error": null,
+                            "context_name": "main",
+                            "navigation_happened": null,
+                            "navigated_url": null
+                        },
+                        {
+                            "type": "fill",
+                            "selector": "//*[@id=\"login-form-username\"]",
+                            "value": "200605",
+                            "text": "200605",
+                            "url": null,
+                            "description": "Kullanıcı adı alanına 200605 yaz",
+                            "prompt": "Kullanıcı adı alanına 200605 yaz",
+                            "timeout": 10000,
+                            "status": "executed",
+                            "validation_selector": "//*[@id=\"login-form-username\"]",
+                            "execution_error": null,
+                            "context_name": "main",
+                            "navigation_happened": null,
+                            "navigated_url": null
+                        },
+                        {
+                            "type": "focus_and_fill",
+                            "selector": "//*[@id=\"login-form-password\"]",
+                            "value": "2040.Focus",
+                            "text": "2040.Focus",
+                            "url": null,
+                            "description": "Şifre alanına 2040.Focus yaz",
+                            "prompt": "Şifre alanına 2040.Focus yaz",
+                            "timeout": 10000,
+                            "status": "executed",
+                            "validation_selector": "//*[@id=\"login-form-password\"]",
+                            "execution_error": null,
+                            "context_name": "main",
+                            "navigation_happened": null,
+                            "navigated_url": null
+                        },
+                        {
+                            "type": "click",
+                            "selector": "//*[@id=\"login\"]",
+                            "value": null,
+                            "text": null,
+                            "url": null,
+                            "description": "Login butonuna tıkla",
+                            "prompt": "Login butonuna tıkla",
+                            "timeout": 10000,
+                            "status": "executed",
+                            "validation_selector": "//*[@id=\"login\"]",
+                            "execution_error": null,
+                            "context_name": "main",
+                            "navigation_happened": true,
+                            "navigated_url": "https://jira.isbank/jira/secure/RapidBoard.jspa"
+                        }
+                    ]
+                }
+            },
+            "execution_order": [
+                "Login_Form"
+            ],
+            "global_settings": {
+                "browser_type": "chromium",
+                "timeout": 30000,
+                "screenshot_on_failure": true,
+                "video_recording": false,
+                "attach_timeout": 10000,
+                "screenshot_path": "REFramework/screenshots",
+                "last_known_url": "https://jira.isbank/jira/secure/RapidBoard.jspa",
+                "initial_url": "https://jira.isbank/jira/secure/Dashboard.jspa",
+                "browser_executable_paths": {
+                    "chromium": "",
+                    "firefox": "",
+                    "webkit": null
+                }
+            }
+        }
+    ],
+    "parameters": {
+        "cyberark_domain": "",
+        "queue_db_query": "",
+        "har_recording": true,
+        "queue_name": "",
+        "dlq_queue_name": "",
+        "mongo_collection_name": "",
+        "s3_bucket_name": "",
+        "could_dchost_run": false,
+        "image_name": "",
+        "use_frontend": true,
+        "parellel_count": 1,
+        "user_username": "",
+        "user_password": "",
+        "Nar_Users": [],
+        "MaxRetryNumber": 3,
+        "service_parameters": {}
+    }
+}

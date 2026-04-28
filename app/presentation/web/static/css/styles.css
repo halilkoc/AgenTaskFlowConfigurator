@@ -1,0 +1,123 @@
+* {
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+body {
+    margin: 0;
+    background: #f4f6f8;
+    color: #1f2937;
+}
+.page {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px;
+}
+.header {
+    margin-bottom: 24px;
+}
+.header h1 {
+    margin: 0 0 8px 0;
+}
+.header p {
+    margin: 0;
+    color: #4b5563;
+}
+.layout {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+.panel {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+.left-panel {
+    width: 38%;
+}
+.right-panel {
+    width: 62%;
+}
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+}
+.form-group label {
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+}
+.button-row {
+    margin-bottom: 12px;
+}
+button {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    cursor: pointer;
+    background: #2563eb;
+    color: #ffffff;
+    font-weight: 600;
+}
+button.secondary {
+    background: #6b7280;
+}
+button.success {
+    background: #059669;
+}
+.status-box {
+    margin-top: 20px;
+    padding: 14px;
+    border-radius: 8px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+}
+.json-viewer {
+    width: 100%;
+    min-height: 700px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 12px;
+    resize: vertical;
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 13px;
+}
+.checkbox-group {
+    display: flex;
+    align-items: center;
+}
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 0;
+    font-weight: 600;
+}
+.error-text {
+    color: #b91c1c;
+    word-break: break-word;
+}
+.json-viewer {
+    white-space: pre;
+}
+.right-panel .button-row {
+    margin-top: 12px;
+}
+.hidden-json {
+    display: none;
+}
+.small-json {
+    min-height: 140px;
+    max-height: 220px;
+}

@@ -1,0 +1,94 @@
+app/
+  main.py
+  presentation/
+    web/
+      routes/
+        ui_routes.py
+        api_routes.py
+      templates/
+        index.html
+      static/
+        js/
+        css/
+  application/
+    use_cases/
+      start_browser_session.py
+      stop_browser_session.py
+      run_prompt.py
+      generate_flow_config.py
+      patch_selector.py
+    dto/
+      flow_dto.py
+      session_dto.py
+  domain/
+    models/
+      flow_config.py
+      category.py
+      action.py
+      browser_session.py
+      selector_candidate.py
+      correction.py
+    services/
+      selector_strategy_service.py
+      flow_builder_service.py
+      correction_learning_service.py
+    ports/
+      llm_port.py
+      browser_port.py
+      flow_repository_port.py
+  infrastructure/
+    llm/
+      qwen_vl_client.py
+    browser/
+      playwright_runtime.py
+      dom_extractor.py
+      xpath_builder.py
+      event_recorder.py
+    persistence/
+      json_flow_repository.py
+      correction_repository.py
+    logging/
+      logger.py
+  shared/
+    config/
+      settings.py
+    utils/
+      json_utils.py
+      retry.py
+      time_utils.py
+--------------------------------------------------
+agentask_designer/
+│
+├─ app/
+│  ├─ main.py
+│  │
+│  ├─ presentation/
+│  │  └─ web/
+│  │     ├─ routes/
+│  │     │  └─ ui_routes.py
+│  │     ├─ templates/
+│  │     │  └─ index.html
+│  │     └─ static/
+│  │        └─ css/
+│  │           └─ styles.css
+│  │
+│  ├─ application/
+│  │  ├─ dto/
+│  │  │  └─ ui_dto.py
+│  │  └─ use_cases/
+│  │     └─ initialize_flow_config.py
+│  │
+│  ├─ domain/
+│  │  └─ models/
+│  │     └─ flow_config.py
+│  │
+│  ├─ infrastructure/
+│  │  └─ persistence/
+│  │     └─ in_memory_session_store.py
+│  │
+│  └─ shared/
+│     └─ config/
+│        └─ settings.py
+│
+├─ requirements.txt
+└─ .env
